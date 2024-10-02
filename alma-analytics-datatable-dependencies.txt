@@ -1,0 +1,7 @@
+<link href="https://cdn.datatables.net/2.0.5/css/dataTables.dataTables.min.css" rel="stylesheet" type="text/css">
+<link href="https://cdn.datatables.net/fixedheader/4.0.1/css/fixedHeader.dataTables.min.css">
+<link href="https://cdn.datatables.net/colreorder/2.0.1/css/colReorder.dataTables.min.css">
+
+<script src="https://cdn.datatables.net/2.0.5/js/dataTables.min.js" type="text/javascript"></script>
+<script src="https://cdn.datatables.net/fixedheader/4.0.1/js/dataTables.fixedHeader.min.js" type="text/javascript"></script>
+<script src="https://cdn.datatables.net/colreorder/2.0.1/js/dataTables.colReorder.min.js" type="text/javascript"></script>
