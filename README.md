@@ -10,7 +10,7 @@ Client-side JavaScript code for embedding Alma Analytics reports in webpages usi
 
 - Create an Analytics API key in the Developer Network. Make sure your account is affiliated with your campus.
 
-- Test the API call: https://api-na.hosted.exlibrisgroup.com/almaws/v1/analytics/reports?apikey=<YOUR_KEY>&path=<PATH_PARAMETER>
+- Test the API call: https://api-na.hosted.exlibrisgroup.com/almaws/v1/analytics/reports?apikey={YOUR_KEY}&path={PATH_PARAMETER}
 
 ### 2. Link to DataTable JS and CSS files
 Copy the links from the <b>alma-analytics-datatables-dependencies.txt</b> file with the <head></head> section of your page.
