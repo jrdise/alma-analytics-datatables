@@ -1,0 +1,146 @@
+<table id="XMLtable" class="table table-striped">
+</table>
+
+<script>
+
+// API URL and parameters
+const apiKey = "l8xxa045621drf6249g0k8b55d12345g9d8cd"; // ****replace with your API key****
+const path = "%2Fshared%2FUniversity%20at%20Buffalo%2001SUNY_BUF%2FReports%2FPerson%20Name%20reports%2FReport%20Name" // ****replace with the path parameter of your Analytics report URL****
+const limit = "1000"; // how many rows to get back per request (max=1000)
+
+const url = `https://api-na.hosted.exlibrisgroup.com/almaws/v1/analytics/reports?apikey=${apiKey}&limit=${limit}&path=${path}`;
+
+// Primo search URL variables
+const addLinkstoTitles = 'true'; // set to 'true' or 'false' - 'true' value adds Primo links to Title field (requires 'Title and 'MMS Id' columns in Analytics report to work)
+const primoBaseURL = "https://search.lib.buffalo.edu" // ****repalce with your institution's Primo domain (e.g., "https://thslc-mdanderson.primo.exlibrisgroup.com/")****
+const primoViewID = "01SUNY_BUF:everything" // ****replace with your institution's Primo View ID (vid)****
+
+const primoSearch = "${primoBaseURL}/discovery/fulldisplay?&vid=${primoViewID}";
+
+// Create data object
+let dataObj = {
+   headings: [],
+   rows: []
+};
+
+// Functions
+async function getData(fetchUrl) {
+   const response = await fetch(fetchUrl);
+   const data = await response.text();
+   let parser = new DOMParser(),
+   xml = parser.parseFromString(data, "text/xml");
+   return xml;
+};
+
+async function buildDataObj() {
+   const xml = await getData(`https://api-na.hosted.exlibrisgroup.com/almaws/v1/analytics/reports?apikey=${apiKey}&limit=${limit}&path=${path}`);
+   let isFinishedStatus = xml.getElementsByTagName("IsFinished")[0].innerHTML;
+   const token = xml.getElementsByTagName('ResumptionToken')[0].innerHTML; // assign redemption token value
+   let columnData = xml.getElementsByTagName('xsd:element');     
+   const rowsData = Array.from(xml.getElementsByTagName('Row'));
+
+   // Push column headings data (column names and text) data to dataObj
+   for (i=0; i < columnData.length; i++) {
+      dataObj.headings.push({ columnName: columnData[i].getAttribute('name'), text: columnData[i].getAttribute('saw-sql:columnHeading') })
+   };
+
+   // Loop fetch requests until all rows are returned
+   while (isFinishedStatus === "false") {
+      const newXml = await getData(`https://api-na.hosted.exlibrisgroup.com/almaws/v1/analytics/reports?apikey=${apiKey}&limit=${limit}&token=${token}`);
+      isFinishedStatus = newXml.getElementsByTagName("IsFinished")[0].innerHTML;
+      if (isFinishedStatus === "true"){
+         console.log('all rows returned');
+      };
+      let newRowsData = newXml.getElementsByTagName('Row');
+      for (i=0; i < newRowsData.length; i++) {
+         rowsData.push(newRowsData[i]);
+      };
+   };
+   
+   // Push row data (column names and text) to dataObj
+   for (i=0; i < rowsData.length; i++) {
+      let rowObject = {};
+      dataObj.headings.forEach(function(heading) {
+         rowObject[heading.columnName] = '';
+      });
+
+      // dataObj.rows.push({ row: [] });
+      for (x=0; x < rowsData[i].children.length; x++) {
+         let rowColumnName = rowsData[i].children[x].nodeName;
+         let rowColumnText = rowsData[i].children[x].innerHTML;
+         rowObject[rowColumnName] = rowColumnText;
+      };
+      dataObj.rows.push(rowObject);
+   };
+   console.log(dataObj);
+};
+
+async function buildTableHtml() {
+   await buildDataObj();
+   let tableHTML = "";
+
+   // Store the column name (e.g., 'Column1') for the 'MMS Id' and 'Title' columns
+   let MMSIdColumnNum;
+   let titleColumnNum;
+   dataObj.headings.forEach(function(heading) {
+      if (heading.text === 'MMS Id') {
+         MMSIdColumnNum = heading.columnName;
+      };
+      if (heading.text === 'Title') {
+         titleColumnNum = heading.columnName;
+      };
+   });
+   
+   // Build column headings HTML
+   let columnHeadingsHTML = "";
+   for (i=0; i < dataObj.headings.length; i++) {
+      columnHeadingsHTML += `<th>${dataObj.headings[i].text}</th>`;
+   };
+
+   // Build rows HTML
+   let rowsHTML = "";  
+   for (i=0; i < dataObj.rows.length; i++) {
+        rowsHTML += '<tr>';
+        const object = dataObj.rows[i];
+        for (const property in object) {
+            if (addLinkstoTitles === 'true' && titleColumnNum !== undefined && MMSIdColumnNum !== undefined && property === titleColumnNum) {
+                rowsHTML += `<td><a href="${primoSearch}&docid=alma${object[MMSIdColumnNum]}" target="_blank">${object[property]}</a></td>`;
+            } else {
+                rowsHTML += `<td>${object[property]}</td>`;
+            };
+        };
+        rowsHTML += '</tr>';
+   };
+
+   // Get table by ID and add headings and rows HTML
+   document.getElementById('XMLtable').innerHTML = `
+      <thead>
+         <tr>
+         ${columnHeadingsHTML}
+         </tr>
+      </thead>
+      <tbody>
+         ${rowsHTML}
+      </tbody>
+   `;
+};
+
+// Convert HTML table to DataTable
+async function initDataTables() {
+   await buildTableHtml();
+   const myTable = document.querySelector("#XMLtable");
+   let options = { // view more DataTable options - https://datatables.net/reference/option/
+      pageLength: 25, // set records per page to display (default is 10)
+      scrollX: true, // adds horizontal scroll bar for large tables
+      fixedHeader: true, // fixes table header to top of page when scrolling
+      columnDefs: [
+         { targets: [0], visible: false} // hides Column0; add additional columns to be hidden (e.g., [0, 3, 5])
+      ]
+   }
+   let table = new DataTable(myTable, options);
+};
+
+// Run the function to fetch our data and build the DataTable when HTML page has loaded
+document.addEventListener('DOMContentLoaded', initDataTables());
+
+</script>
