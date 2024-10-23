@@ -5,7 +5,7 @@
 
 // API URL and parameters
 const apiKey = "l8xxa045621drf6249g0k8b55d12345g9d8cd"; // ****replace with your API key****
-const path = "%2Fshared%2FUniversity%20at%20Buffalo%2001SUNY_BUF%2FReports%2FPerson%20Name%20reports%2FReport%20Name" // ****replace with the path parameter of your Analytics report URL****
+const path = "%2Fshared%2FUniversity%20at%20Buffalo%2001SUNY_BUF%2FReports%2FPerson%20Name%2FReport%20Name" // ****replace with the path parameter of your Analytics report URL****
 const limit = "1000"; // how many rows to get back per request (max=1000)
 
 const url = `https://api-na.hosted.exlibrisgroup.com/almaws/v1/analytics/reports?apikey=${apiKey}&limit=${limit}&path=${path}`;
