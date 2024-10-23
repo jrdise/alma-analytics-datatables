@@ -15,7 +15,7 @@ const addLinkstoTitles = 'true'; // set to 'true' or 'false' - 'true' value adds
 const primoBaseURL = "https://search.lib.buffalo.edu" // ****repalce with your institution's Primo domain (e.g., "https://your-inst.primo.exlibrisgroup.com/")****
 const primoViewID = "01SUNY_BUF:everything" // ****replace with your institution's Primo View ID (vid)****
 
-const primoSearch = "${primoBaseURL}/discovery/fulldisplay?&vid=${primoViewID}";
+const primoSearch = `${primoBaseURL}/discovery/fulldisplay?vid=${primoViewID}`;
 
 // Create data object
 let dataObj = {
