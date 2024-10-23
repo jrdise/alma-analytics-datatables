@@ -12,7 +12,7 @@ const url = `https://api-na.hosted.exlibrisgroup.com/almaws/v1/analytics/reports
 
 // Primo search URL variables
 const addLinkstoTitles = 'true'; // set to 'true' or 'false' - 'true' value adds Primo links to Title field (requires 'Title and 'MMS Id' columns in Analytics report to work)
-const primoBaseURL = "https://search.lib.buffalo.edu" // ****repalce with your institution's Primo domain (e.g., "https://your-inst.primo.exlibrisgroup.com/")****
+const primoBaseURL = "https://search.lib.buffalo.edu" // ****replace with your institution's Primo domain (e.g., "https://your-inst.primo.exlibrisgroup.com/")****
 const primoViewID = "01SUNY_BUF:everything" // ****replace with your institution's Primo View ID (vid)****
 
 const primoSearch = `${primoBaseURL}/discovery/fulldisplay?vid=${primoViewID}`;
@@ -134,8 +134,13 @@ async function initDataTables() {
       scrollX: true, // adds horizontal scroll bar for large tables
       fixedHeader: true, // fixes table header to top of page when scrolling
       columnDefs: [
-         { targets: [0], visible: false} // hides Column0; add additional columns to be hidden (e.g., [0, 3, 5])
-      ]
+         { targets: [0], visible: false} // hides Column0; add additional columns to be hidden (e.g., [0,3,5])
+      ],
+
+      /* ADDITIONAL OPTIONS: Remove the "//" before the option names below to use (e.g., "// colReorder" => "colReorder") */
+      // colReorder: { order: [5,4,3,2,1,0] }, // reorders columns; number of columns listed must match total number of columns - https://datatables.net/reference/option/colReorder.order
+      // order: [[6, 'asc']] // sets order during initialisation - https://datatables.net/reference/option/order
+
    }
    let table = new DataTable(myTable, options);
 };
